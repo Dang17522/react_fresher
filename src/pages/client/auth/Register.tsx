@@ -1,7 +1,8 @@
+import { loginAPI, register } from '@/services/api';
 import type { FormProps } from 'antd';
 import { Button, Card, Divider, Form, Input, message } from 'antd';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 const Register = () => {
   type FieldType = {
     username?: string;
@@ -13,9 +14,11 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
-  const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
+  const navigate = useNavigate();
+
+  const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
     setLoading(true);
-    if(values.password !== values.enterPassword){
+    if (values.password !== values.enterPassword) {
       messageApi.open({
         type: 'error',
         content: 'Nhập lại mật khẩu không đúng',
@@ -24,6 +27,21 @@ const Register = () => {
       return;
     }
     console.log('Success:', values);
+    const res = await register(values.username ?? '', values.email ?? '', values.password ?? '').then((res) => {
+      if (res.data && res.data.status && res.data.status === 200) {
+        messageApi.open({
+          type: 'success',
+          content: 'Đăng ký tài khoản thành cong',
+        });
+        navigate('/login');
+
+      }else{
+        messageApi.open({
+          type: 'error',
+          content: res.data.message ,
+        });
+      }
+    })
     setLoading(false);
   };
 
@@ -35,7 +53,7 @@ const Register = () => {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      height: '100vh', 
+      height: '100vh',
     }}>
       {contextHolder}
       <Card title="Đăng Ký Tài Khoản" bordered={true} style={{ width: 500 }}>
@@ -52,8 +70,7 @@ const Register = () => {
           <Form.Item<FieldType>
             label="Tên đăng nhập"
             name="username"
-            rules={[{ required: true, message: 'Vui lòng nhập tên !!!' }]}
-          >
+            rules={[{ required: true, message: 'Vui lòng nhập tên !!!' }]}>
             <Input />
           </Form.Item>
 
@@ -63,12 +80,9 @@ const Register = () => {
             rules={[
               { required: true, message: 'Vui lòng nhập email !!!' },
               { type: "email", message: "Không đúng định dạng email !" }
-            ]}
-          >
+            ]}>
             <Input />
           </Form.Item>
-
-          
 
           <Form.Item<FieldType>
             label="Phone Number"
@@ -76,11 +90,10 @@ const Register = () => {
             rules={[
               {
                 required: true,
-                
                 type: "regexp",
                 pattern: new RegExp(/\d+/g),
                 message: "Không đúng định dạng sđt !"
-              },{
+              }, {
                 min: 10,
                 max: 10,
                 message: "Không đúng định dạng sđt (10 ký tự)"
@@ -95,8 +108,7 @@ const Register = () => {
             name="password"
             rules={[{ required: true, min: 6, message: 'Vui lòng nhập mật khẩu tối thiểu 6 ký tự !!!' },
 
-            ]}
-          >
+            ]}>
             <Input.Password />
           </Form.Item>
 
@@ -105,8 +117,7 @@ const Register = () => {
             name="enterPassword"
             rules={[{ required: true, min: 6, message: 'Vui lòng nhập mật khẩu tối thiểu 6 ký tự !!!' },
 
-            ]}
-          >
+            ]}>
             <Input.Password />
           </Form.Item>
 
