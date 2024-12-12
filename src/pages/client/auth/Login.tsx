@@ -1,9 +1,9 @@
-import { Button, Divider, Form, FormProps, Input, message, Modal, notification } from "antd";
+import { useCurrentApp } from "@/components/context/app.context";
+import { loginAPI } from "@/services/api";
+import { Button, Divider, Form, FormProps, Input, Modal, notification } from "antd";
+import icon from "assets/images/Mobile login-bro.png";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import icon from "assets/images/Mobile login-bro.png"
-import { loginAPI } from "@/services/api";
-import { useCurrentApp } from "@/components/context/app.context";
 type FieldType = {
   username?: string;
   password?: string;
@@ -17,6 +17,7 @@ const Login = () => {
 const {setIsAuthenticated,setUser} = useCurrentApp();
   const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
     setLoading(true);
+    console.log("->>: ",values);
     const res = await loginAPI(values.username ?? '', values.password ?? '');
     console.log("->>: ",res.data);
     if(res.data && res.data.status && res.data.status === 200){

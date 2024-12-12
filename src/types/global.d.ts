@@ -17,7 +17,7 @@ declare global {
 
     }
     interface ILogin {
-        data: IUser | null;
+        data: IUser;
         token: string;
         refeshToken: string,
         message: string;
@@ -28,17 +28,40 @@ declare global {
             email: string,
             avatar: string,
             role: string,
-            fullname: string
+            fullname: string,
+            createAt: Date
         },
+    }
+
+    interface ILogout {
+        message: string;
+        status: number;
     }
 
     interface IUser {
         id: number,
         username: string,
+        fullname: string,
         email: string,
         avatar: string,
         role: string,
-        fullname: string
-
+        createAt: Date,
+        data?: T
     }
+    
+    interface IModalPage<T> {
+        content:T[],
+        number: number,
+        size: number,
+        totalPages: number,
+        totalElements: number
+    }
+
+    interface IData<T> {
+        message?: string;
+        status: number;
+        content?: T
+    }
+
+    
 }

@@ -4,6 +4,7 @@ import AppHeader from "./components/layout/AppHeader"
 import { getUserByToken } from "./services/api"
 import { useCurrentApp } from "./components/context/app.context";
 import { PuffLoader } from "react-spinners";
+import FooterPage from "./components/layout/Footer";
 
 function Layout() {
   const token = localStorage.getItem('token') ?? '';
@@ -14,18 +15,21 @@ function Layout() {
       console.log("fetchUserToken: ", res);
       if (res.data?.status === 200) {
         setIsAuthenticated(true);
-        setUser(res.data?.data);
+        setUser(res.data.data);
       } else if (res?.status === 401) {
         setIsAuthenticated(false);
         setUser(null);
         localStorage.removeItem('token');
         localStorage.removeItem('refeshToken');
       }
+      setAppLoading(false);
     }
     if (token !== '') {
       fetchUser();
+    }else{
+      setAppLoading(false);
     }
-    setAppLoading(false);
+    
   }, [])
   return (
     <div>
@@ -37,6 +41,7 @@ function Layout() {
       /> : <>
         <AppHeader />
         <Outlet />
+        <FooterPage/>
       </>}
     </div>
 

@@ -1,4 +1,4 @@
-import { loginAPI, register } from '@/services/api';
+import { register } from '@/services/api';
 import type { FormProps } from 'antd';
 import { Button, Card, Divider, Form, Input, message } from 'antd';
 import { useState } from 'react';
@@ -27,7 +27,7 @@ const Register = () => {
       return;
     }
     console.log('Success:', values);
-    const res = await register(values.username ?? '', values.email ?? '', values.password ?? '').then((res) => {
+    const res = await register(values.username ?? '', values.email ?? '', values.password ?? '', 'User').then((res) => {
       if (res.data && res.data.status && res.data.status === 200) {
         messageApi.open({
           type: 'success',
