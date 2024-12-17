@@ -38,6 +38,13 @@ export const getUserByToken = (token: string) => {
     })
 }
 
+export const importData = (file: any) => {
+    const urlBackEnd = "/api/admin/accounts/importData";
+    return axios.post<IBackendRes<ILogin>>(urlBackEnd,{
+        file: file
+    })
+}
+
 export const getListUserByKey = (key: string | null,startTime: string | null, endTime: string | null, sort: string | null,  pageSize: number, pageNumber: number) => {
     const urlBackEnd = `/api/users?key=${key}&startTime=${startTime}&endTime=${endTime}&sort=${sort}&pageSize=${pageSize}&pageNumber=${pageNumber}`;
     return axios.get<IBackendRes<IModalPage<IUser>>>(urlBackEnd)

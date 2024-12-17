@@ -1,37 +1,26 @@
+import { importData } from '@/services/api';
 import { InboxOutlined } from '@ant-design/icons';
-import { message, Modal, UploadProps } from 'antd';
+import { message, Modal, Table, UploadProps } from 'antd';
 import Dragger from 'antd/es/upload/Dragger';
-import { useState } from 'react';
-import * as ExcelJS from 'exceljs';
 import { Buffer } from 'buffer';
-import { json } from 'react-router-dom';
+import * as ExcelJS from 'exceljs';
+import { useState } from 'react';
 const props: UploadProps = {
-    name: 'file',
-    multiple: true,
-    action: 'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload',
-    onChange(info) {
-        const { status } = info.file;
-        if (status !== 'uploading') {
-            console.log(info.file, info.fileList);
-        }
-        if (status === 'done') {
-            message.success(`${info.file.name} file uploaded successfully.`);
-        } else if (status === 'error') {
-            message.error(`${info.file.name} file upload failed.`);
-        }
-    },
-    onDrop(e) {
-        console.log('Dropped files', e.dataTransfer.files);
-    },
+    
 };
 const ModalImportData = (props: any) => {
     const { modalOpenImport, setModalOpenImport } = props;
     const [messageApi, contextHolder] = message.useMessage();
     const [loading, setLoading] = useState(false);
     const [excelData, setExcelData] = useState([]);
+    const [upload, setUpload] = useState<boolean>(true);
+    const [file, setFile] = useState<any>();
 
     const handleChange = async (e: any) => {
-        console.log(e.file.originFileObj);
+        if(upload === true){
+           setUpload(false);
+           setFile(e.file.originFileObj);
+        
         const arrayBuffer = await e.file.originFileObj.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
 
@@ -77,10 +66,36 @@ const ModalImportData = (props: any) => {
         } catch (error) {
             console.error('Error reading Excel file:', error);
         }
-
+    }
     }
 
+    const columns = [
+        {
+          title: 'Username',
+          dataIndex: 'username',
+          key: 'username',
+        },
+        {
+          title: 'Fullname',
+          dataIndex: 'fullname',
+          key: 'fullname',
+        },
+        {
+          title: 'Email',
+          dataIndex: ['email', 'text'],
+          key: 'email',
+          
+        },
+        {
+            title: 'Password',
+            dataIndex: 'password',
+            key: 'password',
+          },
+      ];
 
+      const handleImport = async () => {
+          const res = await importData(file);
+      }
     return (
         <div>
             {contextHolder}
@@ -88,13 +103,13 @@ const ModalImportData = (props: any) => {
                 title="Import Data User"
                 centered
                 onCancel={() => setModalOpenImport(false)}
-                onOk={() => setModalOpenImport(false)}
+                onOk={() => handleImport()}
                 open={modalOpenImport}
                 // footer={null}
                 closeIcon={false}
             >
 
-                <Dragger {...props} onChange={(e) => handleChange(e)}>
+                <Dragger showUploadList={false} onChange={(e) => handleChange(e)} maxCount={1}>
                     <p className="ant-upload-drag-icon">
                         <InboxOutlined />
                     </p>
@@ -106,13 +121,15 @@ const ModalImportData = (props: any) => {
                 </Dragger>
                 {excelData.length > 0 && (
                     <div>
-                        {excelData.map((item: any, index: number) => (
+                        {/* {excelData.map((item: any, index: number) => (
                             <div key={index}>
-                                <p>{JSON.stringify(item.username)}</p>
+                                <p>{JSON.stringify(item)}</p>
                             </div>
                                 
 
-                        ))}
+                        ))} */}
+                        
+                        <Table dataSource={excelData} columns={columns} />
                     </div>
 
                 )}
