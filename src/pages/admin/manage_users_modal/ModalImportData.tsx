@@ -1,6 +1,6 @@
-import { importData } from '@/services/api';
+import { exportData, importData } from '@/services/api';
 import { InboxOutlined } from '@ant-design/icons';
-import { message, Modal, Table, UploadProps } from 'antd';
+import { Divider, message, Modal, Table, TableProps, UploadProps } from 'antd';
 import Dragger from 'antd/es/upload/Dragger';
 import { Buffer } from 'buffer';
 import * as ExcelJS from 'exceljs';
@@ -15,6 +15,13 @@ const ModalImportData = (props: any) => {
     const [excelData, setExcelData] = useState([]);
     const [upload, setUpload] = useState<boolean>(true);
     const [file, setFile] = useState<any>();
+    
+    const [tableParams, setTableParams] = useState<any>({
+        pagination: {
+          current: 1,
+          pageSize: 5,
+        },
+      });
 
     const handleChange = async (e: any) => {
         if (upload === true) {
@@ -98,10 +105,18 @@ const ModalImportData = (props: any) => {
             key: 'role',
         },
     ];
+    const handleTableChange: TableProps<any>['onChange'] = (pagination, filters, sorter) => {
+        setTableParams({
+          pagination
+        });
+    
+       
+      };
+
+    
 
     const handleImport = async () => {
         const res = await importData(file);
-        console.log("res: ", res);
         if (res.data?.status === 200) {
             messageApi.open({
                 type: 'success',
@@ -115,6 +130,30 @@ const ModalImportData = (props: any) => {
             });
             setModalOpenImport(false);
         }
+        setExcelData([]);
+    }
+
+    const handleExport = async () => {
+        const response = await exportData();
+        console.log("response: ", response);
+        const blob = response?.data;
+        const url = window.URL.createObjectURL(blob );
+        
+        // Get filename from content-disposition header or use default
+        const fileName = `export_${new Date().toISOString()}.xlsx`;
+        
+        // Create download link
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        
+        // Cleanup
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        
     }
         return (
             <div>
@@ -135,10 +174,12 @@ const ModalImportData = (props: any) => {
                         </p>
                         <p className="ant-upload-text">Click or drag file to this area to upload</p>
                         <p className="ant-upload-hint">
-                            Support for a single or bulk upload. Strictly prohibited from uploading company data or other
-                            banned files.
+                            Support for a single file excel 
                         </p>
+                        
                     </Dragger>
+                    <Divider style={{ borderColor: '#1890ff', width: '200px' }}><a onClick={() => handleExport()}>Export data to excel</a></Divider>
+                    
                     {excelData.length > 0 && (
                         <div>
                             {/* {excelData.map((item: any, index: number) => (
@@ -149,7 +190,7 @@ const ModalImportData = (props: any) => {
 
                         ))} */}
 
-                            <Table dataSource={excelData} columns={columns} />
+                            <Table dataSource={excelData} columns={columns} pagination={tableParams.pagination} onChange={handleTableChange}  />
                         </div>
 
                     )}

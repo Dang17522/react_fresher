@@ -18,6 +18,7 @@
     "exceljs": "^4.4.0",
     "react": "^18.3.1",
     "react_fresher": "file:",
+    "react-csv": "2.2.2",
     "react-dom": "^18.3.1",
     "react-icons": "^5.4.0",
     "react-router-dom": "6.27.0",
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@eslint/js": "^9.13.0",
     "@types/react": "^18.3.12",
+    "@types/react-csv": "1.1.10",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "eslint": "^9.13.0",

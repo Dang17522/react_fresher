@@ -9,6 +9,7 @@ import { MdOutlineEdit } from 'react-icons/md';
 import ModalAddUser from './manage_users_modal/ModalAddUser';
 import ModalUpdateUser from './manage_users_modal/ModalUpdateUser';
 import ModalImportData from './manage_users_modal/ModalImportData';
+import { CSVLink } from 'react-csv';
 // import request from 'umi-request';
 export const waitTimePromise = async (time: number = 100) => {
   return new Promise((resolve) => {
@@ -54,7 +55,7 @@ const ManageUser = () => {
   const [modalOpenImport, setModalOpenImport] = useState(false);
   const [modalUpdateOpen, setModalUpdateOpen] = useState(false);
   const [userUpdate, setUserUpdate] = useState<IUser>();
-
+  const [dataCsv, setDataCsv] = useState<IUser[] | undefined>([]);
   const onShowSizeChange: PaginationProps['onShowSizeChange'] = (current, pageSize) => {
     if (current !== pageNumber) {
       setPageNumber(current);
@@ -255,6 +256,7 @@ const ManageUser = () => {
           setPageSizeData(res.data?.size as number);
           setTotalPage(res.data?.totalElements as number);
           setPageNumber(res.data?.number as number + 1);
+          setDataCsv(res.data?.content);
         }
         return {
           data: res.data?.content as unknown as IUser[],
@@ -314,6 +316,7 @@ const ManageUser = () => {
       dateFormatter="string"
       headerTitle="List User"
       toolBarRender={() => [
+        <CSVLink data={dataCsv} filename={"user.csv"} style={{ color: 'blue' }} className="ant-btn ant-btn-default ant-btn-dashed" target="_blank" >Export</CSVLink>,
         <Button type="dashed" key="primary" style={{ backgroundColor: 'pink', color: 'white' }}
           onClick={() => { setModalOpenImport(true); }}
         >

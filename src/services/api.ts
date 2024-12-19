@@ -49,6 +49,16 @@ export const importData = (file: any) => {
     })
 }
 
+export const exportData = () => {
+    const urlBackEnd = "/api/admin/accounts/exportFileExcel";
+    return axios.get<IBackendRes<ILogin>>(urlBackEnd,{
+        responseType: 'blob',
+        headers: {
+            'Accept': 'application/vnd.ms-excel'
+        }
+    })
+}
+
 export const getListUserByKey = (key: string | null, startTime: string | null, endTime: string | null, sort: string | null, pageSize: number, pageNumber: number) => {
     const urlBackEnd = `/api/users?key=${key}&startTime=${startTime}&endTime=${endTime}&sort=${sort}&pageSize=${pageSize}&pageNumber=${pageNumber}`;
     return axios.get<IBackendRes<IModalPage<IUser>>>(urlBackEnd)
