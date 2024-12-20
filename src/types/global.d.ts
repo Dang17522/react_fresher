@@ -48,7 +48,40 @@ declare global {
         createAt: Date,
         data?: T
     }
+
+    interface ICategory {
+        id: number,
+        name: string,
+    }
+
+    interface IProduct {
+        id: number,
+        name: string,
+        status: string,
+        image: string,
+        avatar: string,
+        quantity: number,
+        vote: number,
+        createAt: Date,
+        data?: T
+    }
     
+    interface IApiProduct {
+        data: IProduct;
+        message: string;
+        status: number;
+        product: {
+            id: number,
+            name: string,
+            status: string,
+            image: string,
+            avatar: string,
+            quantity: number,
+            vote: number,
+            createAt: Date,
+        },
+    }
+
     interface IModalPage<T> {
         content:T[],
         number: number,

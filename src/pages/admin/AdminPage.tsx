@@ -53,8 +53,7 @@ const AdminPage = () => {
       label: 'Manage Book',
       icon: <SiNginxproxymanager />,
       children: [
-        { key: '6', label: 'Option 9' },
-        { key: '7', label: 'Option 10' },
+        { key: '3', label: 'CRUD Product',onClick: () => navigate('/admin/product'),icon: <IoCreateOutline />},
       ],
     },
     {

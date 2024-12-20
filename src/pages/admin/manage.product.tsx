@@ -1,15 +1,13 @@
-import { deleteUser, getListUserByKey } from '@/services/api';
+import { deleteUser, getListProductByKey } from '@/services/api';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { Button, message, Popconfirm, PopconfirmProps, Space, Tag } from 'antd';
 import { PaginationProps } from 'antd/lib';
 import { useRef, useState } from 'react';
-import { CSVLink } from 'react-csv';
 import { FcDeleteColumn, FcDeleteRow } from 'react-icons/fc';
 import { MdOutlineEdit } from 'react-icons/md';
-import ModalAddUser from './manage_users_modal/ModalAddUser';
-import ModalImportData from './manage_users_modal/ModalImportData';
-import ModalUpdateUser from './manage_users_modal/ModalUpdateUser';
+import ModalAddProduct from './manage_product_modal/ModalAddProduct';
+import ModalUpdateProduct from './manage_product_modal/ModalUpdateProduct';
 // import request from 'umi-request';
 export const waitTimePromise = async (time: number = 100) => {
   return new Promise((resolve) => {
@@ -35,17 +33,17 @@ export const waitTime = async (time: number = 100) => {
   await waitTimePromise(time);
 };
 
-type IUser = {
+type IProduct = {
   id: number,
-  username: string,
-  fullname: string,
-  email: string,
-  avatar: string,
-  role: string,
+  name: string,
+  status: number,
+  image: string,
+  quantity: number,
+  vote: number,
   createAt: Date
 };
 
-const ManageUser = () => {
+const ManageProduct = () => {
   const actionRef = useRef<ActionType>();
   const [key, setKey] = useState('');
   const [pageSizeData, setPageSizeData] = useState(5);
@@ -54,8 +52,8 @@ const ManageUser = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalOpenImport, setModalOpenImport] = useState(false);
   const [modalUpdateOpen, setModalUpdateOpen] = useState(false);
-  const [userUpdate, setUserUpdate] = useState<IUser>();
-  const [dataCsv, setDataCsv] = useState<IUser[] | undefined>([]);
+  const [productUpdate, setProductUpdate] = useState<IProduct>();
+  const [dataCsv, setDataCsv] = useState<IProduct[] | undefined>([]);
   const onShowSizeChange: PaginationProps['onShowSizeChange'] = (current, pageSize) => {
     if (current !== pageNumber) {
       setPageNumber(current);
@@ -65,9 +63,9 @@ const ManageUser = () => {
     }
   };
 
-  const handleUpdate = (record: IUser) => {
+  const handleUpdate = (record: IProduct) => {
     setModalUpdateOpen(true);
-    setUserUpdate(record);
+    setProductUpdate(record);
   }
 
   const confirm: PopconfirmProps['onConfirm'] = (e) => {
@@ -79,7 +77,7 @@ const ManageUser = () => {
     console.log(e);
   };
 
-  const handleDelete = async (record: IUser) => {
+  const handleDelete = async (record: IProduct) => {
     const res = await deleteUser(record.id);
     if (res.data?.status === 200) {
       message.success(res.data.message);
@@ -88,20 +86,20 @@ const ManageUser = () => {
     }
   }
 
-  const columns: ProColumns<IUser>[] = [
+  const columns: ProColumns<IProduct>[] = [
     {
       dataIndex: 'index',
       valueType: 'indexBorder',
       width: 48,
     },
     {
-      title: 'User',
+      title: 'Product',
       dataIndex: 'key',
       // copyable: true,
       // ellipsis: true,
       // valueType: 'key',
       hideInTable: true,
-      tooltip: 'find by username | email',
+      tooltip: 'find by name',
       formItemProps: {
         rules: [
           {
@@ -119,8 +117,8 @@ const ManageUser = () => {
     },
     {
       disable: true,
-      title: 'username',
-      dataIndex: 'username',
+      title: 'name',
+      dataIndex: 'name',
       search: false,
       renderFormItem: (_, { defaultRender }) => {
         return defaultRender(_);
@@ -128,32 +126,19 @@ const ManageUser = () => {
       render: (_, record) => (
         <Space>
 
-          <Tag color={generateColor()} key={record.username}>
-            {record.username}
+          <Tag color={generateColor()} key={record.name}>
+            {record.name}
           </Tag>
 
         </Space>
       ),
     },
+   
+    
     {
-      title: 'fullname',
-      key: 'fullname',
-      dataIndex: 'fullname',
-      hideInSearch: true,
-    },
-    {
-      title: 'email',
-      key: 'email',
-      dataIndex: 'email',
-      // valueType: 'date',
-      copyable: true,
-      // sorter: true,
-      hideInSearch: true,
-    },
-    {
-      title: 'avatar',
-      key: 'avatar',
-      dataIndex: 'avatar',
+      title: 'image',
+      key: 'image',
+      dataIndex: 'image',
       hideInSearch: true,
       // valueType: 'date',
       // sorter: true,
@@ -162,24 +147,36 @@ const ManageUser = () => {
         <img
           width={50}
           height={50}
-          src={record.avatar}
-          alt={record.username}
+          src={record.image}
+          alt={record.image}
         />
       )
     },
     {
-      title: 'role',
-      key: 'role',
-      dataIndex: 'role',
+      title: 'status',
+      key: 'status',
+      dataIndex: 'status',
+      // valueType: 'date',
+      // copyable: true,
+      // sorter: true,
       hideInSearch: true,
-      render: (_, record) => (
-        <Space>
-          <Tag color={record.role === 'Admin' ? 'red' : 'green'} >
-            {record.role}
-          </Tag>
-
-        </Space>
-      )
+    },
+    {
+      title: 'quantity',
+      key: 'quantity',
+      dataIndex: 'quantity',
+      // valueType: 'date',
+      // copyable: true,
+      // sorter: true,
+      hideInSearch: true,
+    },
+    {
+      title: 'vote',
+      key: 'vote',
+      dataIndex: 'vote',
+      hideInSearch: true,
+      sorter: true,
+      
     },
     {
       title: 'createAt',
@@ -198,20 +195,6 @@ const ManageUser = () => {
       )
     },
     {
-      title: 'Create Time',
-      dataIndex: 'created_at',
-      valueType: 'dateRange',
-      hideInTable: true,
-      search: {
-        transform: (value) => {
-          return {
-            startTime: value[0],
-            endTime: value[1],
-          };
-        },
-      },
-    },
-    {
       title: 'Action',
       valueType: 'option',
       key: 'option',
@@ -228,7 +211,7 @@ const ManageUser = () => {
           title="Delete User"
           description={
             <div>
-              Are you sure to delete use {record.username} <FcDeleteColumn /><FcDeleteColumn /><FcDeleteColumn />
+              Are you sure to delete use {record.name} <FcDeleteColumn /><FcDeleteColumn /><FcDeleteColumn />
             </div>
           }
           onConfirm={() => handleDelete(record)}
@@ -242,24 +225,23 @@ const ManageUser = () => {
     },
   ];
   return (
-    <div><ProTable<IUser>
+    <div><ProTable<IProduct>
       columns={columns}
       actionRef={actionRef}
       cardBordered
       request={async (params, sort, filter) => {
         const sortBy = sort.createAt ?? null;
         const key = params.key ?? '';
-        const startTime = params.startTime ?? '';
-        const endTime = params.endTime ?? '';
-        const res = await getListUserByKey(key, startTime, endTime, sortBy, pageSizeData, pageNumber);
+        const res = await getListProductByKey(key,sortBy, pageSizeData, pageNumber);
+        console.log("res: ", res.data?.content);
         if (res) {
           setPageSizeData(res.data?.size as number);
           setTotalPage(res.data?.totalElements as number);
           setPageNumber(res.data?.number as number + 1);
-          setDataCsv(res.data?.content);
+          setDataCsv(res.data?.content as unknown as IProduct[]);
         }
         return {
-          data: res.data?.content as unknown as IUser[],
+          data: res.data?.content as unknown as IProduct[],
           success: true,
           total: totalPage,
           page: pageNumber,
@@ -314,9 +296,9 @@ const ManageUser = () => {
       }
       }
       dateFormatter="string"
-      headerTitle="List User"
+      headerTitle="List Product"
       toolBarRender={() => [
-        <CSVLink data={dataCsv as unknown as IUser[]} filename={"user.csv"} style={{ color: 'blue' }} className="ant-btn ant-btn-default ant-btn-dashed" target="_blank" >Export</CSVLink>,
+        // <CSVLink data={dataCsv} filename={"user.csv"} style={{ color: 'blue' }} className="ant-btn ant-btn-default ant-btn-dashed" target="_blank" >Export</CSVLink>,
         <Button type="dashed" key="primary" style={{ backgroundColor: 'pink', color: 'white' }}
           onClick={() => { setModalOpenImport(true); }}
         >
@@ -332,11 +314,11 @@ const ManageUser = () => {
 
 
     />
-      <ModalAddUser modalOpen={modalOpen} setModalOpen={setModalOpen} />
-      <ModalUpdateUser modalUpdateOpen={modalUpdateOpen} setModalUpdateOpen={setModalUpdateOpen} userUpdate={userUpdate} setUserUpdate={setUserUpdate} />
-      <ModalImportData modalOpenImport={modalOpenImport} setModalOpenImport={setModalOpenImport} />
+      <ModalAddProduct modalOpen={modalOpen} setModalOpen={setModalOpen} />
+      <ModalUpdateProduct modalUpdateOpen={modalUpdateOpen} setModalUpdateOpen={setModalUpdateOpen} productUpdate={productUpdate} setProductUpdate={setProductUpdate} />
+      {/* <ModalImportData modalOpenImport={modalOpenImport} setModalOpenImport={setModalOpenImport} /> */}
     </div>
   )
 }
 
-export default ManageUser
+export default ManageProduct

@@ -19,9 +19,9 @@ import {
 import 'styles/global.scss';
 import Layout from './layout';
 import DashBoadrd from './pages/admin/dashBoadrd';
-import ManageBook from './pages/admin/manage.book';
 import ManageOrder from './pages/admin/manage.order';
 import ManageUser from './pages/admin/manage.user';
+import ManageProduct from './pages/admin/manage.product';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -93,8 +93,8 @@ const router = createBrowserRouter([
         element: <ManageUser />,
       },
       {
-        path: "/admin/book",
-        element: <ManageBook />,
+        path: "/admin/product",
+        element: <ManageProduct />,
       },
       {
         path: "/admin/order",
