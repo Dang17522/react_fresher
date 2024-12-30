@@ -12,11 +12,12 @@ type FieldType = {
     image: any,
     quantity: number,
     vote: number,
-    createAt: Date
-    category: any
+    createAt: Date,
+    category: any,
+    price: number
 };
 const ModalUpdateProduct = (props: any) => {
-    const { modalUpdateOpen, setModalUpdateOpen, productUpdate, setProductUpdate } = props;
+    const { modalUpdateOpen, setModalUpdateOpen, productUpdate } = props;
     const [category, setCategory] = useState<ICategory[]>([]);
     const [messageApi, contextHolder] = message.useMessage();
     const [loading, setLoading] = useState(false);
@@ -25,14 +26,14 @@ const ModalUpdateProduct = (props: any) => {
     const [id, setId] = useState<number>();
     useEffect(() => {
         if (productUpdate) {
-            console.log(productUpdate);
             setId(productUpdate.id)
             form.setFieldsValue({
                 name: productUpdate.name,
                 status: productUpdate.status == 1 ? 'Active' : 'Inactive',
                 image: productUpdate.image,
                 quantity: productUpdate.quantity,
-                category: productUpdate.category
+                category: productUpdate.category,
+                price: productUpdate.price
             });
         }
 
@@ -123,6 +124,22 @@ const ModalUpdateProduct = (props: any) => {
                                 { value: '0', label: 'Inactive' },
                             ]}
                         />
+                    </Form.Item>
+
+                    <Form.Item<FieldType>
+                        label="Price"
+                        name="price"
+                        rules={[
+                            {
+                                required: true,
+                                min: 1,
+                                max: 5,
+                                message: "not valid format number",
+                                pattern: new RegExp(/^[0-9]+$/)
+                            }
+                        ]}
+                    >
+                        <Input type='number' maxLength={5} />
                     </Form.Item>
 
                     <Form.Item<FieldType>

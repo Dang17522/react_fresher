@@ -39,6 +39,7 @@ type IProduct = {
   status: number,
   image: string,
   quantity: number,
+  price: number,
   vote: number,
   createAt: Date
 };
@@ -160,6 +161,20 @@ const ManageProduct = () => {
       // copyable: true,
       // sorter: true,
       hideInSearch: true,
+    },
+    {
+      title: 'price',
+      key: 'price',
+      dataIndex: 'price',
+      // valueType: 'date',
+      // copyable: true,
+      // sorter: true,
+      hideInSearch: true,
+      render: (_, record) => (
+        <div>
+          {record.price} $
+        </div>
+      )
     },
     {
       title: 'quantity',

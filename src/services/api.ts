@@ -5,22 +5,23 @@ export const register = (username: string, email: string, password: string, role
     return axios.post<IBackendRes<ILogin>>(urlBackEnd, { username, email, password, role })
 }
 
-export const createProduct = (name: string, status: number, quantity: number, image: any, category:number) => {
+export const createProduct = (name: string, status: number, price: number, quantity: number, image: any, category: number) => {
     const urlBackEnd = "/api/products/";
     const formData = new FormData();
     formData.append('name', name);
     formData.append('status', status.toString());
+    formData.append('price', price.toString());
     formData.append('quantity', quantity.toString());
     formData.append('file', image);
     formData.append('category', category.toString());
-    return axios.post<IBackendRes<IApiProduct>>(urlBackEnd,formData,{
+    return axios.post<IBackendRes<IApiProduct>>(urlBackEnd, formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
     })
 }
 
-export const updateProduct = (id: number,name: string, status: number | string, quantity: number, image: any, category:number) => {
+export const updateProduct = (id: number, name: string, status: number | string, quantity: number, image: any, category: number) => {
     const urlBackEnd = `/api/products/${id}`;
     const formData = new FormData();
     formData.append('name', name);
@@ -28,7 +29,7 @@ export const updateProduct = (id: number,name: string, status: number | string, 
     formData.append('quantity', quantity.toString());
     formData.append('file', image);
     formData.append('category', category.toString());
-    return axios.put<IBackendRes<IApiProduct>>(urlBackEnd,formData,{
+    return axios.put<IBackendRes<IApiProduct>>(urlBackEnd, formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
@@ -81,7 +82,7 @@ export const importData = (file: any) => {
 
 export const exportData = () => {
     const urlBackEnd = "/api/admin/accounts/exportFileExcel";
-    return axios.get<IBackendRes<ILogin>>(urlBackEnd,{
+    return axios.get<IBackendRes<ILogin>>(urlBackEnd, {
         responseType: 'blob',
         headers: {
             'Accept': 'application/vnd.ms-excel'
@@ -103,6 +104,12 @@ export const getListProductByKey = (key: string | null, sort: string | null, pag
     const urlBackEnd = `/api/products?key=${key}&sort=${sort}&pageSize=${pageSize}&pageNumber=${pageNumber}`;
     return axios.get<IBackendRes<IModalPage<IProduct>>>(urlBackEnd)
 }
+
+export const getListProductByFilter = (key: string | null, sort: string | null, category: String[] | number[], price: number[], rate: number, pageSize: number, pageNumber: number) => {
+    const urlBackEnd = `/api/products/home?key=${key}&sort=${sort}&category=${category}&price=${price}&rate=${rate}&pageSize=${pageSize}&pageNumber=${pageNumber}`;
+    return axios.get<IBackendRes<IModalPage<IProduct>>>(urlBackEnd)
+}
+
 
 
 export const getListUser = (pageSize: number, pageNumber: number) => {

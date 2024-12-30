@@ -11,7 +11,8 @@ type FieldType = {
     quantity?: number;
     vote?: string;
     image?: any;
-    category?: number
+    category?: number;
+    price?: number
 };
 const ModalAddProduct = (props: any) => {
 
@@ -22,7 +23,7 @@ const ModalAddProduct = (props: any) => {
     const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
         setLoading(true);
         console.log('Success:', values.category);
-        const res = await createProduct(values.name ?? '', values.status ?? 1, values.quantity ?? 1, values?.image?.file?.originFileObj ?? '', values.category ?? 1 ).then((res) => {
+        const res = await createProduct(values.name ?? '', values.status ?? 1,values.price ?? 1, values.quantity ?? 1, values?.image?.file?.originFileObj ?? '', values.category ?? 1 ).then((res) => {
             if (res.data && res.data.status && res.data.status === 200) {
                 messageApi.open({
                     type: 'success',
@@ -102,6 +103,22 @@ const ModalAddProduct = (props: any) => {
                     </Form.Item>
 
                     <Form.Item<FieldType>
+                        label="Price"
+                        name="price"
+                        rules={[
+                            {
+                                required: true,
+                                min: 1,
+                                max: 5,
+                                message: "not valid format number",
+                                pattern: new RegExp(/^[0-9]+$/)
+                            }
+                        ]}
+                    >
+                        <Input type='number' maxLength={5} />
+                    </Form.Item>
+
+                    <Form.Item<FieldType>
                         label="Quantity"
                         name="quantity"
                         rules={[
@@ -110,7 +127,7 @@ const ModalAddProduct = (props: any) => {
                                 min: 1,
                                 max: 5,
                                 message: "not valid format number",
-                                pattern: new RegExp(/^[0-9]+$/)
+                                pattern: new RegExp(/^[1-9]+$/)
                             }
                         ]}
                     >
