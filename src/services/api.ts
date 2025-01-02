@@ -41,6 +41,11 @@ export const update = (id: number, username: string, email: string, fullname: st
     return axios.put<IBackendRes<ILogin>>(urlBackEnd, { id, username, email, fullname, password, role })
 }
 
+export const getProductById = (id: number) => {
+    const urlBackEnd = "/api/products/" + id;
+    return axios.get<IBackendRes<IApiProduct>>(urlBackEnd)
+}
+
 export const deleteUser = (id: number) => {
     const urlBackEnd = `api/admin/delete/${id}`;
     return axios.delete<IBackendRes<ILogin>>(urlBackEnd)

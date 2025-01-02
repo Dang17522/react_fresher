@@ -17,6 +17,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import 'styles/global.scss';
+import 'react-image-gallery/styles/scss/image-gallery.scss';
 import Layout from './layout';
 import DashBoadrd from './pages/admin/dashBoadrd';
 import ManageOrder from './pages/admin/manage.order';
@@ -41,7 +42,7 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: "/book",
+        path: "/product/:id",
         element: <BookPage />,
       },
       {

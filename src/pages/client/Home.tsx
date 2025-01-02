@@ -7,11 +7,13 @@ import { useEffect, useState } from "react";
 import { FaAmazonPay } from "react-icons/fa";
 import { LiaCartPlusSolid, LiaFillSolid } from "react-icons/lia";
 import { RiMoneyDollarBoxLine } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
 import { ClimbingBoxLoader } from "react-spinners";
 const HomePage = () => {
   const [appLoading, setAppLoading] = useState(true);
   const [valueFirst, setValueFirst] = useState(20);
   const [valueSecond, setValueSecond] = useState(50);
+  const [sort, setSort] = useState('createAt');
   const [valueSelectFirst, setValueSelectFirst] = useState(20);
   const [valueSelectSecond, setValueSelectSecond] = useState(50);
   const [value, setValue] = useState(1);
@@ -29,6 +31,7 @@ const HomePage = () => {
   const [totalPage, setTotalPage] = useState(0);
   const [checkAll, setCheckAll] = useState(listCategory.length === checkedList.length);
   const indeterminate = checkedList.length > 0 && checkedList.length < listCategory.length;
+  const navigate = useNavigate();
   const onCheckAllChange: CheckboxProps['onChange'] = (e) => {
     setCheckedList(e.target.checked ? listCategory.map((item) => item.name) : []);
 
@@ -80,23 +83,30 @@ const HomePage = () => {
   const items: TabsProps['items'] = [
     {
       key: '1',
-      label: 'Phổ biến',
-      // children: 'Content of Tab Pane 1',
+      label: <div>
+        <span onClick={() => setSort('quantity')}>Phổ biến</span>
+      </div>,
     },
     {
       key: '2',
-      label: 'Sản phẩm mới cập nhật',
-      // children: 'Content of Tab Pane 2',
+      label: <div>
+        <span onClick={() => setSort('createAt')}>Sản phẩm mới cập nhật</span>
+      </div>,
+
     },
     {
       key: '3',
-      label: 'Giá từ thấp đến cao',
-      // children: 'Content of Tab Pane 3',
+      label: <div>
+        <span onClick={() => setSort('price')}>Giá từ thấp đến cao</span>
+      </div>,
+
     },
     {
       key: '4',
-      label: 'Giá từ cao đến thấp',
-      // children: 'Content of Tab Pane 3',
+      label: <div>
+        <span onClick={() => setSort('priceDesc')}>Giá từ cao đến thấp</span>
+      </div>,
+
     },
   ];
 
@@ -108,7 +118,7 @@ const HomePage = () => {
     setCheckedList(list);
 
     form.setFieldsValue({ category: list });
-    if(checkedList.length === listCategory.length){
+    if (checkedList.length === listCategory.length) {
       setCheckAll(true);
     }
     console.log("checkedList", checkedList.length);
@@ -139,7 +149,7 @@ const HomePage = () => {
   }
 
   const fetchListProduct = async () => {
-    const res = await getListProductByFilter("", "createAt",checkedList, [valueFirst, valueSecond], value, pageSizeData, pageNumber);
+    const res = await getListProductByFilter("",sort, checkedList, [valueFirst, valueSecond], value, pageSizeData, pageNumber);
     if (res) {
       setListProduct(res?.data?.content ?? []);
       setTotalPage(res?.data?.totalPages ?? 0);
@@ -150,9 +160,10 @@ const HomePage = () => {
   }, [])
 
   useEffect(() => {
+    setAppLoading(true);
     fetchListProduct();
     setAppLoading(false);
-  }, [pageNumber, pageSizeData, valueFirst, valueSecond, value, checkedList])
+  }, [pageNumber, pageSizeData, valueFirst, valueSecond, value, checkedList,sort])
 
   const onShowSizeChange: PaginationProps['onShowSizeChange'] = (current, pageSize) => {
     setLoading(true);
@@ -166,123 +177,123 @@ const HomePage = () => {
   };
   return (
     <div>
-
-     {appLoading ? <ClimbingBoxLoader  color="#4a0fff"
-        cssOverride={{ position: "fixed",  left: "50%", }}
+      {appLoading ? <ClimbingBoxLoader color="#4a0fff"
+        cssOverride={{ position: "fixed", left: "50%", }}
         size={10}
-        speedMultiplier={1}/> : <>
-      <Layout>
+        speedMultiplier={1} /> : <>
         <Layout>
-          <Sider width="25%" style={siderStyle}>
-            <div style={{ marginLeft: "10px" }}>
-              <h2 style={{ textAlign: "center", color: "black" }}>Lọc sản phẩm <LiaFillSolid /></h2>
-              <Form
-                form={form}
-                layout="vertical"
-                onFinish={onFinishForm}
-                onFinishFailed={onFinishFailed}
-                autoComplete="off"
-              >
-                <Divider />
-                <Form.Item
-                  name="category"
-                  label="Danh mục sản phẩm"
-                // rules={[{ required: true }, { type: 'url', warningOnly: true }, { type: 'string', min: 6 }]}
+          <Layout>
+            <Sider width="25%" style={siderStyle}>
+              <div style={{ marginLeft: "10px" }}>
+                <h2 style={{ textAlign: "center", color: "black" }}>Lọc sản phẩm <LiaFillSolid /></h2>
+                <Form
+                  form={form}
+                  layout="vertical"
+                  onFinish={onFinishForm}
+                  onFinishFailed={onFinishFailed}
+                  autoComplete="off"
                 >
-                  <Checkbox.Group style={{ width: '100%', margin: "0px", padding: "0px" }}>
-                    <CheckboxGroup options={listCategory.map((item: any) => item.name)} value={checkedList.map((item: any) => item)} onChange={onChangeCheckInput} />
-                    <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>
-                      Check all
-                    </Checkbox>
-
-                  </Checkbox.Group>
-                </Form.Item>
-                <Form.Item
-                  name="price"
-                  label={
-                    <div>
-                      <div style={{ paddingTop: "10px", color: "black" }}>Theo giá sản phẩm <RiMoneyDollarBoxLine /></div>
-                    </div>
-                  }
-                >
-                  <Slider range={{ draggableTrack: true }} value={[valueSelectFirst, valueSelectSecond]} onChange={onChange} max={200} />
-                  <Row style={{ display: "flex", justifyContent: "center" }}>
-                    <Col md={8} sm={24} xs={24} >
-                      <InputNumber value={valueFirst} onChange={(e) => handleChangeFirst(e as number)} min={0} max={200}
-                      />
-                    </Col>
-                    <Col md={8} sm={24} xs={24}>
-                      <InputNumber value={valueSecond} onChange={(e) => handleChangeSecond(e as number)} min={0} max={200}
-                      />
-                    </Col>
-                  </Row>
-                </Form.Item>
-
-                <Form.Item
-                  name="rate"
-                  label={
-                    <div>
-                      <div style={{ paddingTop: "10px", color: "black" }}>Theo đánh giá <RiMoneyDollarBoxLine /></div>
-                    </div>
-                  }
-                >
-                  <Flex gap="middle" vertical style={{ textAlign: "center" }}>
-                    <Rate onChange={handleRateChange} value={value} />
-                    {/* {value ? <span>{desc[value - 1]}</span> : null} */}
-                  </Flex>
-                </Form.Item>
-                <Form.Item>
-                  <Space style={{ textAlign: "center" }}>
-                    <Button type="primary" htmlType="submit" >
-                      Tìm kiếm
-                    </Button>
-
-                  </Space>
-                </Form.Item>
-              </Form>
-
-            </div>
-          </Sider>
-          <Content style={contentStyle}>
-            <Tabs defaultActiveKey="1" items={items} onChange={onChangeNav} />
-            <Spin tip="Loading" spinning={loading}> 
-            <Row >
-              {listProduct.map((item: any) => (
-                <Col span={6} style={{ marginBottom: "20px" }}>
-                  <Card
-                    hoverable
-                    style={{ width: 240 }}
-                    cover={<img alt="example" src={item.image} height={200} />}
-                    actions={[
-                      <FaAmazonPay fontSize={30} key="setting" />,
-                      <LiaCartPlusSolid fontSize={30} key="edit" />,
-                      <Rate value={item.vote} disabled/>
-                    ]}
+                  <Divider />
+                  <Form.Item
+                    name="category"
+                    label="Danh mục sản phẩm"
+                  // rules={[{ required: true }, { type: 'url', war ningOnly: true }, { type: 'string', min: 6 }]}
                   >
-                    <Meta title={item.name} description={<div style={{ color: "#99CC33" }}>
-                      {item.price + " $"}
-                    </div>} />
-                  </Card>
-                </Col>
-              ))}
+                    <Checkbox.Group style={{ width: '100%', margin: "0px", padding: "0px" }}>
+                      <CheckboxGroup options={listCategory.map((item: any) => item.name)} value={checkedList.map((item: any) => item)} onChange={onChangeCheckInput} />
+                      <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>
+                        Check all
+                      </Checkbox>
 
-            </Row>
-            </Spin>
-            <Divider />
-            <Row style={{ display: "flex", justifyContent: "center" }}>
-              <Pagination current={pageNumber} pageSize={pageSizeData} total={totalPage} onChange={onShowSizeChange}
-                showTotal={(totalPage, range) => (
-                  <span style={{ right: 0 }}>
-                    Showing {range[0]}-{range[1]} of {totalPage}
-                  </span>
-                )}
-              />
-            </Row>
-          </Content>
+                    </Checkbox.Group>
+                  </Form.Item>
+                  <Form.Item
+                    name="price"
+                    label={
+                      <div>
+                        <div style={{ paddingTop: "10px", color: "black" }}>Theo giá sản phẩm <RiMoneyDollarBoxLine /></div>
+                      </div>
+                    }
+                  >
+                    <Slider range={{ draggableTrack: true }} value={[valueSelectFirst, valueSelectSecond]} onChange={onChange} max={200} />
+                    <Row style={{ display: "flex", justifyContent: "center" }}>
+                      <Col md={8} sm={24} xs={24} >
+                        <InputNumber value={valueFirst} onChange={(e) => handleChangeFirst(e as number)} min={0} max={200}
+                        />
+                      </Col>
+                      <Col md={8} sm={24} xs={24}>
+                        <InputNumber value={valueSecond} onChange={(e) => handleChangeSecond(e as number)} min={0} max={200}
+                        />
+                      </Col>
+                    </Row>
+                  </Form.Item>
 
+                  <Form.Item
+                    name="rate"
+                    label={
+                      <div>
+                        <div style={{ paddingTop: "10px", color: "black" }}>Theo đánh giá <RiMoneyDollarBoxLine /></div>
+                      </div>
+                    }
+                  >
+                    <Flex gap="middle" vertical style={{ textAlign: "center" }}>
+                      <Rate onChange={handleRateChange} value={value} />
+                      {/* {value ? <span>{desc[value - 1]}</span> : null} */}
+                    </Flex>
+                  </Form.Item>
+                  <Form.Item>
+                    <Space style={{ textAlign: "center" }}>
+                      <Button type="primary" htmlType="submit" >
+                        Tìm kiếm
+                      </Button>
+
+                    </Space>
+                  </Form.Item>
+                </Form>
+
+              </div>
+            </Sider>
+            <Content style={contentStyle}>
+              <Tabs defaultActiveKey="1" items={items} onChange={onChangeNav} />
+              <Spin tip="Loading" spinning={loading}>
+                <Row >
+                  {listProduct.map((item: any) => (
+                    <Col span={6} style={{ marginBottom: "20px" }}>
+                      <Card
+                        onClick={() => navigate(`/product/${item.id}`)}
+                        hoverable
+                        style={{ width: 240 }}
+                        cover={<img alt="example" src={item.image} height={200} />}
+                        actions={[
+                          <FaAmazonPay fontSize={30} key="setting" />,
+                          <LiaCartPlusSolid fontSize={30} key="edit" />,
+                          <Rate value={item.vote} disabled />
+                        ]}
+                      >
+                        <Meta title={item.name} description={<div style={{ color: "#99CC33" }}>
+                          {item.price + " $"}
+                        </div>} />
+                      </Card>
+                    </Col>
+                  ))}
+
+                </Row>
+              </Spin>
+              <Divider />
+              <Row style={{ display: "flex", justifyContent: "center" }}>
+                <Pagination current={pageNumber} pageSize={pageSizeData} total={totalPage} onChange={onShowSizeChange}
+                  showTotal={(totalPage, range) => (
+                    <span style={{ right: 0 }}>
+                      Showing {range[0]}-{range[1]} of {totalPage}
+                    </span>
+                  )}
+                />
+              </Row>
+            </Content>
+
+          </Layout>
         </Layout>
-      </Layout>
-     </>}
+      </>}
     </div>
   )
 }

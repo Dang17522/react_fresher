@@ -62,6 +62,8 @@ declare global {
         avatar: string,
         quantity: number,
         vote: number,
+        price: number,
+        description: string,
         createAt: Date,
         data?: T
     }
