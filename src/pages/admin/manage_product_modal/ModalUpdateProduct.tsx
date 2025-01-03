@@ -1,6 +1,7 @@
 import { getListCategory, updateProduct } from '@/services/api';
 import { UploadOutlined } from '@ant-design/icons';
-import { Button, Divider, Form, Input, message, Modal, Select, Upload } from 'antd';
+import { Button, Divider, Form, Input, message, Modal, Rate, Select, Upload } from 'antd';
+import TextArea from 'antd/es/input/TextArea';
 import { FormProps } from 'antd/lib';
 import { useEffect, useState } from 'react';
 import { FcCancel } from 'react-icons/fc';
@@ -11,6 +12,7 @@ type FieldType = {
     status: number,
     image: any,
     quantity: number,
+    description: string,
     vote: number,
     createAt: Date,
     category: any,
@@ -32,8 +34,10 @@ const ModalUpdateProduct = (props: any) => {
                 status: productUpdate.status == 1 ? 'Active' : 'Inactive',
                 image: productUpdate.image,
                 quantity: productUpdate.quantity,
+                description: productUpdate.description,
                 category: productUpdate.category,
-                price: productUpdate.price
+                price: productUpdate.price,
+                vote: productUpdate.vote
             });
         }
 
@@ -42,36 +46,35 @@ const ModalUpdateProduct = (props: any) => {
 
 
     const handleLoadCategory = async () => {
-            const res = await getListCategory();
-            if (res) {
-                setCategory(res?.data?.content ?? []);
-            }
+        const res = await getListCategory();
+        if (res) {
+            setCategory(res?.data?.content ?? []);
         }
-        
-        useEffect(() => {
-            handleLoadCategory();
-        }, []);
+    }
+
+    useEffect(() => {
+        handleLoadCategory();
+    }, []);
 
 
     const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
         setLoading(true);
-        
+
         console.log('Success:', values);
-        const res = await updateProduct(id ?? 0, values.name ?? '', values.status ?? 1, values.quantity ?? 1, values?.image?.file?.originFileObj ?? '', values.category ?? 1 ).then((res) => {
-            if (res.data && res.data.status && res.data.status === 200) {
-                messageApi.open({
-                    type: 'success',
-                    content: 'Đăng ký tài khoản thành cong',
-                });
+        const res = await updateProduct(id ?? 0, values.name ?? '', values.status ?? 1, values.quantity ?? 1, values?.image?.file?.originFileObj ?? '', values.category ?? 1, values.description ?? '', values.vote ?? 0, values.price ?? 1);
+        if (res.data && res.data.status && res.data.status === 200) {
+            messageApi.open({
+                type: 'success',
+                content: res?.data?.message,
+            });
 
-            } else {
-                messageApi.open({
-                    type: 'error',
-                    content: res?.data?.message,
-                });
+        } else {
+            messageApi.open({
+                type: 'error',
+                content: res?.data?.message,
+            });
 
-            }
-        })
+        }
         setLoading(false);
         setModalUpdateOpen(false);
     };
@@ -159,6 +162,22 @@ const ModalUpdateProduct = (props: any) => {
                     </Form.Item>
 
                     <Form.Item<FieldType>
+                        label="Description"
+                        name="description"
+
+                    >
+                        <TextArea />
+                    </Form.Item>
+
+                    <Form.Item<FieldType>
+                        label="Quality"
+                        name="vote"
+
+                    >
+                        <Rate />
+                    </Form.Item>
+
+                    <Form.Item<FieldType>
                         label="Category"
                         name="category"
                         rules={[
@@ -178,7 +197,7 @@ const ModalUpdateProduct = (props: any) => {
                     <Form.Item<FieldType>
                         label="Image"
                         name="image"
-                        >
+                    >
                         <Upload showUploadList={false}>
                             <Button icon={<UploadOutlined />}>Click to Upload</Button>
                         </Upload>

@@ -1,6 +1,7 @@
 import { createProduct, getListCategory } from '@/services/api';
 import { UploadOutlined } from '@ant-design/icons';
-import { Button, Divider, Form, Input, message, Modal, Select, Upload } from 'antd';
+import { Button, Divider, Form, Input, message, Modal, Rate, Select, Upload, UploadFile, UploadProps } from 'antd';
+import TextArea from 'antd/es/input/TextArea';
 import { FormProps } from 'antd/lib';
 import { useEffect, useState } from 'react';
 import { FcCancel } from 'react-icons/fc';
@@ -9,10 +10,11 @@ type FieldType = {
     name?: string;
     status?: number;
     quantity?: number;
-    vote?: string;
+    vote?: number;
     image?: any;
+    description?: string;
     category?: number;
-    price?: number
+    price?: number;
 };
 const ModalAddProduct = (props: any) => {
 
@@ -20,23 +22,27 @@ const ModalAddProduct = (props: any) => {
     const [messageApi, contextHolder] = message.useMessage();
     const [loading, setLoading] = useState(false);
     const [category, setCategory] = useState<ICategory[]>([]);
+    const [fileList, setFileList] = useState<UploadFile[]>([
+
+    ]);
     const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
         setLoading(true);
-        console.log('Success:', values.category);
-        const res = await createProduct(values.name ?? '', values.status ?? 1,values.price ?? 1, values.quantity ?? 1, values?.image?.file?.originFileObj ?? '', values.category ?? 1 ).then((res) => {
-            if (res.data && res.data.status && res.data.status === 200) {
-                messageApi.open({
-                    type: 'success',
-                    content: 'Create new product successfully',
-                });
+        console.log('Success:', values.image.fileList);
+        const res = await createProduct(values.name ?? '', values.status ?? 1, values.price ?? 1, values.quantity ?? 1, values?.image?.fileList ?? '', values.category ?? 1, values.description ?? '', values.vote ?? 0);
+        console.log(res);
+        if (res.data && res.data.status && res.data.status === 200) {
+            messageApi.open({
+                type: 'success',
+                content: 'Create new product successfully',
+            });
 
-            } else {
-                messageApi.open({
-                    type: 'error',
-                    content: res.data.message,
-                });
-            }
-        })
+        } else {
+            messageApi.open({
+                type: 'error',
+                content: res?.data?.message,
+            });
+        }
+
         console.log(res);
         setLoading(false);
         setModalOpen(false);
@@ -52,6 +58,33 @@ const ModalAddProduct = (props: any) => {
             setCategory(res?.data?.content ?? []);
         }
     }
+
+
+
+    const handleChange: UploadProps['onChange'] = (info) => {
+        let newFileList = [...info.fileList];
+
+        // 1. Limit the number of uploaded files
+        // Only to show two recent uploaded files, and old ones will be replaced by the new
+        newFileList = newFileList.slice(-7);
+
+        // 2. Read from response and show file link
+        newFileList = newFileList.map((file) => {
+            if (file.response) {
+                // Component will show file.url as link
+                file.url = file.response.url;
+            }
+            return file;
+        });
+
+        setFileList(newFileList);
+    };
+
+    const propss = {
+        action: 'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload',
+        onChange: handleChange,
+        multiple: true,
+    };
 
     useEffect(() => {
         handleLoadCategory();
@@ -135,6 +168,31 @@ const ModalAddProduct = (props: any) => {
                     </Form.Item>
 
                     <Form.Item<FieldType>
+                        label="Quality"
+                        name="vote"
+                        rules={[
+                            {
+                                required: true,
+                              
+                            }
+                        ]}
+                    >
+                        <Rate/>
+                    </Form.Item>
+
+                    <Form.Item<FieldType>
+                        label="Description"
+                        name="description"
+                        rules={[
+                            {
+                                required: false,
+                            }
+                        ]}
+                    >
+                        <TextArea />
+                    </Form.Item>
+
+                    <Form.Item<FieldType>
                         label="Category"
                         name="category"
                         rules={[
@@ -157,7 +215,7 @@ const ModalAddProduct = (props: any) => {
                         rules={[{ required: true },
 
                         ]}>
-                        <Upload showUploadList={false}>
+                        <Upload  {...propss} fileList={fileList} showUploadList={false}>
                             <Button icon={<UploadOutlined />}>Click to Upload</Button>
                         </Upload>
                     </Form.Item>

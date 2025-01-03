@@ -151,6 +151,7 @@ const HomePage = () => {
   const fetchListProduct = async () => {
     const res = await getListProductByFilter("",sort, checkedList, [valueFirst, valueSecond], value, pageSizeData, pageNumber);
     if (res) {
+      console.log("res", res?.data?.content);
       setListProduct(res?.data?.content ?? []);
       setTotalPage(res?.data?.totalPages ?? 0);
     }
@@ -257,13 +258,13 @@ const HomePage = () => {
               <Tabs defaultActiveKey="1" items={items} onChange={onChangeNav} />
               <Spin tip="Loading" spinning={loading}>
                 <Row >
-                  {listProduct.map((item: any) => (
+                  {listProduct.map((item: IProduct) => (
                     <Col span={6} style={{ marginBottom: "20px" }}>
                       <Card
                         onClick={() => navigate(`/product/${item.id}`)}
                         hoverable
                         style={{ width: 240 }}
-                        cover={<img alt="example" src={item.image} height={200} />}
+                        cover={<img alt="example" src={item?.productMultiImage != null ? item?.productMultiImage[0].image: ""} height={200} />}
                         actions={[
                           <FaAmazonPay fontSize={30} key="setting" />,
                           <LiaCartPlusSolid fontSize={30} key="edit" />,

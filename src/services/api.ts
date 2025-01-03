@@ -5,15 +5,21 @@ export const register = (username: string, email: string, password: string, role
     return axios.post<IBackendRes<ILogin>>(urlBackEnd, { username, email, password, role })
 }
 
-export const createProduct = (name: string, status: number, price: number, quantity: number, image: any, category: number) => {
+export const createProduct = (name: string, status: number, price: number, quantity: number, image: any, category: number, description: string,vote: number) => {
     const urlBackEnd = "/api/products/";
     const formData = new FormData();
     formData.append('name', name);
     formData.append('status', status.toString());
     formData.append('price', price.toString());
     formData.append('quantity', quantity.toString());
-    formData.append('file', image);
+    // formData.append('file', image);
     formData.append('category', category.toString());
+    formData.append('vote', vote.toString());
+    formData.append('description', description);
+    // console.log("image__> ", image);
+    image.forEach((f:any) => {
+        formData.append('file', f.originFileObj);
+      });
     return axios.post<IBackendRes<IApiProduct>>(urlBackEnd, formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
@@ -21,14 +27,17 @@ export const createProduct = (name: string, status: number, price: number, quant
     })
 }
 
-export const updateProduct = (id: number, name: string, status: number | string, quantity: number, image: any, category: number) => {
+export const updateProduct = (id: number, name: string, status: number | string, quantity: number, image: any, category: number, description: string, vote: number, price: number) => {
     const urlBackEnd = `/api/products/${id}`;
     const formData = new FormData();
     formData.append('name', name);
     formData.append('status', (status == 'Active' ? 1 : 0).toString());
     formData.append('quantity', quantity.toString());
     formData.append('file', image);
+    formData.append('description', description);
+    formData.append('vote', vote.toString());
     formData.append('category', category.toString());
+    formData.append('price', price.toString());
     return axios.put<IBackendRes<IApiProduct>>(urlBackEnd, formData, {
         headers: {
             'Content-Type': 'multipart/form-data'

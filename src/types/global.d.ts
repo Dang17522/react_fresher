@@ -65,7 +65,13 @@ declare global {
         price: number,
         description: string,
         createAt: Date,
-        data?: T
+        data?: T,
+        productMultiImage: IProductMultiImage[],
+    }
+
+    interface IProductMultiImage {
+        id: number,
+        image: string,
     }
     
     interface IApiProduct {

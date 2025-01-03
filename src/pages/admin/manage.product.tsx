@@ -1,7 +1,7 @@
 import { deleteUser, getListProductByKey } from '@/services/api';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Button, message, Popconfirm, PopconfirmProps, Space, Tag } from 'antd';
+import { Button, message, Popconfirm, PopconfirmProps, Rate, Space, Tag } from 'antd';
 import { PaginationProps } from 'antd/lib';
 import { useRef, useState } from 'react';
 import { FcDeleteColumn, FcDeleteRow } from 'react-icons/fc';
@@ -42,6 +42,7 @@ type IProduct = {
   price: number,
   vote: number,
   createAt: Date
+  productMultiImage: IProductMultiImage[]
 };
 
 const ManageProduct = () => {
@@ -148,7 +149,7 @@ const ManageProduct = () => {
         <img
           width={50}
           height={50}
-          src={record.image}
+          src={record?.productMultiImage[0]?.image ?? ''}
           alt={record.image}
         />
       )
@@ -190,8 +191,12 @@ const ManageProduct = () => {
       key: 'vote',
       dataIndex: 'vote',
       hideInSearch: true,
-      sorter: true,
-      
+      // sorter: true,
+      render: (_, record) => (
+        <div style={{width: 80}}>
+         <Rate value={record.vote} />
+        </div>
+      )
     },
     {
       title: 'createAt',
