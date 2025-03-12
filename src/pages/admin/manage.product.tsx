@@ -1,4 +1,4 @@
-import { deleteUser, getListProductByKey } from '@/services/api';
+import { deleteProduct, deleteUser, getListProductByKey } from '@/services/api';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { Button, message, Popconfirm, PopconfirmProps, Rate, Space, Tag } from 'antd';
@@ -37,6 +37,7 @@ type IProduct = {
   id: number,
   name: string,
   status: number,
+  author: string,
   image: string,
   quantity: number,
   price: number,
@@ -80,7 +81,7 @@ const ManageProduct = () => {
   };
 
   const handleDelete = async (record: IProduct) => {
-    const res = await deleteUser(record.id);
+    const res = await deleteProduct(record.id);
     if (res.data?.status === 200) {
       message.success(res.data.message);
     } else {
@@ -130,6 +131,24 @@ const ManageProduct = () => {
 
           <Tag color={generateColor()} key={record.name}>
             {record.name}
+          </Tag>
+
+        </Space>
+      ),
+    },
+    {
+      disable: true,
+      title: 'author',
+      dataIndex: 'author',
+      search: false,
+      renderFormItem: (_, { defaultRender }) => {
+        return defaultRender(_);
+      },
+      render: (_, record) => (
+        <Space>
+
+          <Tag color={generateColor()} key={record.id}>
+            {record.author}
           </Tag>
 
         </Space>
@@ -228,10 +247,11 @@ const ManageProduct = () => {
 
 
         <Popconfirm
-          title="Delete User"
+        placement="topLeft"
+          title="Delete Product"
           description={
             <div>
-              Are you sure to delete use {record.name} <FcDeleteColumn /><FcDeleteColumn /><FcDeleteColumn />
+              Are you sure to delete product {record.name} <FcDeleteColumn /><FcDeleteColumn /><FcDeleteColumn />
             </div>
           }
           onConfirm={() => handleDelete(record)}
@@ -319,11 +339,11 @@ const ManageProduct = () => {
       headerTitle="List Product"
       toolBarRender={() => [
         // <CSVLink data={dataCsv} filename={"user.csv"} style={{ color: 'blue' }} className="ant-btn ant-btn-default ant-btn-dashed" target="_blank" >Export</CSVLink>,
-        <Button type="dashed" key="primary" style={{ backgroundColor: 'pink', color: 'white' }}
-          onClick={() => { setModalOpenImport(true); }}
-        >
-          Import
-        </Button>,
+        // <Button type="dashed" key="primary" style={{ backgroundColor: 'pink', color: 'white' }}
+        //   onClick={() => { setModalOpenImport(true); }}
+        // >
+        //   Import
+        // </Button>,
         <Button type="dashed" key="primary" style={{ backgroundColor: 'green', color: 'white' }}
           onClick={() => { setModalOpen(true); }}
         >

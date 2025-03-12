@@ -1,5 +1,5 @@
 import { logoutAPI } from "@/services/api";
-import { Badge, Image, Input, Menu, MenuProps } from "antd";
+import { Avatar, Badge, Image, Input, Menu, MenuProps } from "antd";
 import banner from 'assets/images/banner.png';
 import { useState } from "react";
 import { AiOutlineProduct } from "react-icons/ai";
@@ -9,7 +9,7 @@ import { TfiHome, TfiSearch } from "react-icons/tfi";
 import { Link, useNavigate } from "react-router-dom";
 import { useCurrentApp } from "../context/app.context";
 const AppHeader = () => {
-  const { user, isAuthenticated, setIsAuthenticated, setUser } = useCurrentApp();
+  const { user, isAuthenticated, setIsAuthenticated, setUser, coutCart } = useCurrentApp();
   const isAdmin = user?.role === "Admin";
   const avatar = user?.avatar ?? "https://guides.uxtweak.com/wp-content/uploads/2023/05/UXT_User_feedback_01.png";
   type MenuItem = Required<MenuProps>['items'][number];
@@ -72,7 +72,7 @@ const AppHeader = () => {
       icon: <TfiSearch onClick={() => console.log(key)} />,
     },
     ...(isAuthenticated ? [{
-      label: <Link to="/checkout"><Badge count={3}><span></span></Badge></Link>,
+      label: <Link to="/checkout"><Badge count={coutCart}><span></span></Badge></Link>,
       key: 'cart',
       icon: <CiShoppingCart style={{ fontSize: '20px' }} />,
     },] : []),
@@ -85,10 +85,7 @@ const AppHeader = () => {
             onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
           }}
         >
-          <Image
-            width={80}
-            src={avatar}
-          />
+          <Avatar size={45} icon={<img src={avatar} alt="" />} />
         </Image.PreviewGroup>
         {/* <img src={avatar} alt="" width={70} /> */}
       </div>, style: {

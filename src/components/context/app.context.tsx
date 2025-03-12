@@ -7,6 +7,8 @@ interface IAppContext {
   setIsAuthenticated: (v: boolean) => void;
   appLoading: boolean;
   setAppLoading: (v: boolean) => void;
+  coutCart: number;
+  setCoutCart :(v:number)=>void
 }
 
 const CurrentAppContext = createContext<IAppContext | null>(null);
@@ -18,10 +20,11 @@ export const AppProvider = (props: TProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<IUser | null>(null);
   const [appLoading, setAppLoading] = useState(true);
+  const [coutCart, setCoutCart] = useState(0)
 
   return (
     <CurrentAppContext.Provider value={{
-      isAuthenticated, user, setIsAuthenticated, setUser, appLoading, setAppLoading
+      isAuthenticated, user, setIsAuthenticated, setUser, appLoading, setAppLoading,coutCart,setCoutCart
     }}>
       {props.children}
     </CurrentAppContext.Provider>

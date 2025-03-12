@@ -15,6 +15,7 @@ type FieldType = {
     description?: string;
     category?: number;
     price?: number;
+    author?: string
 };
 const ModalAddProduct = (props: any) => {
 
@@ -28,7 +29,7 @@ const ModalAddProduct = (props: any) => {
     const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
         setLoading(true);
         console.log('Success:', values.image.fileList);
-        const res = await createProduct(values.name ?? '', values.status ?? 1, values.price ?? 1, values.quantity ?? 1, values?.image?.fileList ?? '', values.category ?? 1, values.description ?? '', values.vote ?? 0);
+        const res = await createProduct(values.name ?? '',values.author ?? '', values.status ?? 1, values.price ?? 1, values.quantity ?? 1, values?.image?.fileList ?? '', values.category ?? 1, values.description ?? '', values.vote ?? 0);
         console.log(res);
         if (res.data && res.data.status && res.data.status === 200) {
             messageApi.open({
@@ -113,7 +114,18 @@ const ModalAddProduct = (props: any) => {
                     <Form.Item<FieldType>
                         label="Name"
                         name="name"
-                        rules={[{ required: true, message: 'Please enter name  !!!' }]}>
+                        rules={[{ required: true, message: 'Please enter name  !!!' },
+                            {max: 20, message: 'Name must be less than 20 characters'}
+                        ]}>
+                        <Input />
+                    </Form.Item>
+
+                    <Form.Item<FieldType>
+                        label="Author"
+                        name="author"
+                        rules={[{ required: true,  message: 'Please enter author !!!' },
+                            {max: 20, message: 'Author must be less than 20 characters'}
+                        ]}>
                         <Input />
                     </Form.Item>
 

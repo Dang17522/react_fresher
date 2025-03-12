@@ -7,7 +7,7 @@ import ProtectedRoute from 'components/auth';
 import { AppProvider } from 'components/context/app.context';
 import AdminPage from 'pages/admin/AdminPage';
 import AboutPage from 'pages/client/About.tsx';
-import BookPage from 'pages/client/Book.tsx';
+import BookPage from '@/pages/client/ProductDetail';
 import Checkout from 'pages/client/Checkout';
 import HomePage from 'pages/client/Home';
 import { StrictMode } from 'react';

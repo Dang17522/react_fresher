@@ -57,6 +57,7 @@ declare global {
     interface IProduct {
         id: number,
         name: string,
+        author: string,
         status: string,
         image: string,
         avatar: string,
@@ -73,21 +74,23 @@ declare global {
         id: number,
         image: string,
     }
+    interface ICart{
+        product:IProduct,
+        value:number
+    }
     
     interface IApiProduct {
         data: IProduct;
         message: string;
         status: number;
-        product: {
-            id: number,
-            name: string,
-            status: string,
-            image: string,
-            avatar: string,
-            quantity: number,
-            vote: number,
-            createAt: Date,
-        },
+        product: IProduct,
+    }
+
+    interface IApiProductList {
+        data: IProduct[];
+        message: string;
+        status: number;
+        product: IProduct,
     }
 
     interface IModalPage<T> {

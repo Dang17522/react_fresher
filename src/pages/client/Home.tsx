@@ -6,9 +6,10 @@ import Sider from "antd/es/layout/Sider";
 import { useEffect, useState } from "react";
 import { FaAmazonPay } from "react-icons/fa";
 import { LiaCartPlusSolid, LiaFillSolid } from "react-icons/lia";
+import { PiShootingStarThin } from "react-icons/pi";
 import { RiMoneyDollarBoxLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
-import { ClimbingBoxLoader } from "react-spinners";
+import { DotLoader } from "react-spinners";
 const HomePage = () => {
   const [appLoading, setAppLoading] = useState(true);
   const [valueFirst, setValueFirst] = useState(20);
@@ -178,9 +179,9 @@ const HomePage = () => {
   };
   return (
     <div>
-      {appLoading ? <ClimbingBoxLoader color="#4a0fff"
+      {appLoading ? <DotLoader color="#009900"
         cssOverride={{ position: "fixed", left: "50%", }}
-        size={10}
+        size={100}
         speedMultiplier={1} /> : <>
         <Layout>
           <Layout>
@@ -212,7 +213,7 @@ const HomePage = () => {
                     name="price"
                     label={
                       <div>
-                        <div style={{ paddingTop: "10px", color: "black" }}>Theo giá sản phẩm <RiMoneyDollarBoxLine /></div>
+                        <div style={{ paddingTop: "10px", color: "black" }}>Theo giá sản phẩm <RiMoneyDollarBoxLine size={25} /></div>
                       </div>
                     }
                   >
@@ -233,7 +234,7 @@ const HomePage = () => {
                     name="rate"
                     label={
                       <div>
-                        <div style={{ paddingTop: "10px", color: "black" }}>Theo đánh giá <RiMoneyDollarBoxLine /></div>
+                        <div style={{ paddingTop: "10px", color: "black" }}>Theo đánh giá <PiShootingStarThin size={25} /></div>
                       </div>
                     }
                   >

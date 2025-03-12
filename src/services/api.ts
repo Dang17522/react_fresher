@@ -5,10 +5,11 @@ export const register = (username: string, email: string, password: string, role
     return axios.post<IBackendRes<ILogin>>(urlBackEnd, { username, email, password, role })
 }
 
-export const createProduct = (name: string, status: number, price: number, quantity: number, image: any, category: number, description: string,vote: number) => {
+export const createProduct = (name: string, author:string, status: number, price: number, quantity: number, image: any, category: number, description: string,vote: number) => {
     const urlBackEnd = "/api/products/";
     const formData = new FormData();
     formData.append('name', name);
+    formData.append('author', author);
     formData.append('status', status.toString());
     formData.append('price', price.toString());
     formData.append('quantity', quantity.toString());
@@ -27,18 +28,25 @@ export const createProduct = (name: string, status: number, price: number, quant
     })
 }
 
-export const updateProduct = (id: number, name: string, status: number | string, quantity: number, image: any, category: number, description: string, vote: number, price: number) => {
+export const updateProduct = (id: number, name: string,author: string, status: number | string, quantity: number, image: any, category: number, description: string, vote: number, price: number) => {
     const urlBackEnd = `/api/products/${id}`;
     const formData = new FormData();
     formData.append('name', name);
+    formData.append('author', author);
     formData.append('status', (status == 'Active' ? 1 : 0).toString());
     formData.append('quantity', quantity.toString());
-    formData.append('file', image);
     formData.append('description', description);
     formData.append('vote', vote.toString());
     formData.append('category', category.toString());
     formData.append('price', price.toString());
-    return axios.put<IBackendRes<IApiProduct>>(urlBackEnd, formData, {
+    console.log("image__> ", image);
+    if(image.length > 0){
+        image.forEach((f:any) => {
+            formData.append('file', f.originFileObj);
+          });
+    }
+    
+    return axios.put<IBackendRes<IApiProductList>>(urlBackEnd, formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
@@ -55,9 +63,24 @@ export const getProductById = (id: number) => {
     return axios.get<IBackendRes<IApiProduct>>(urlBackEnd)
 }
 
+export const getProductByAuthor = (id: number) => {
+    const urlBackEnd = "/api/products/findByAuthor/" + id;
+    return axios.get<IBackendRes<IApiProductList>>(urlBackEnd)
+}
+
 export const deleteUser = (id: number) => {
     const urlBackEnd = `api/admin/delete/${id}`;
     return axios.delete<IBackendRes<ILogin>>(urlBackEnd)
+}
+
+export const deleteProduct = (id: number) => {
+    const urlBackEnd = `api/products/delete/${id}`;
+    return axios.delete<IBackendRes<IApiProduct>>(urlBackEnd)
+}
+
+export const deleteProductMultiImage = (productId: number, id: number) => {
+    const urlBackEnd = `api/productMultiImage/delete/product/${productId}/${id}`;
+    return axios.delete<IBackendRes<IApiProduct>>(urlBackEnd)
 }
 
 
