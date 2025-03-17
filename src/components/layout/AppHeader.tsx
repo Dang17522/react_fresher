@@ -1,7 +1,8 @@
 import { logoutAPI } from "@/services/api";
-import { Avatar, Badge, Image, Input, Menu, MenuProps } from "antd";
+import { Avatar, Badge, Button, Col, Divider, Image, Input, Menu, MenuProps, Popover, Row, Typography } from "antd";
+import { PopoverProps } from "antd/lib";
 import banner from 'assets/images/banner.png';
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AiOutlineProduct } from "react-icons/ai";
 import { BiMessageSquareDetail } from "react-icons/bi";
 import { CiShoppingCart } from "react-icons/ci";
@@ -9,13 +10,15 @@ import { TfiHome, TfiSearch } from "react-icons/tfi";
 import { Link, useNavigate } from "react-router-dom";
 import { useCurrentApp } from "../context/app.context";
 const AppHeader = () => {
-  const { user, isAuthenticated, setIsAuthenticated, setUser, coutCart } = useCurrentApp();
+  const { user, isAuthenticated, setIsAuthenticated, setUser, coutCart, carts } = useCurrentApp();
+  console.log("carts: ", carts);
+
   const isAdmin = user?.role === "Admin";
   const avatar = user?.avatar ?? "https://guides.uxtweak.com/wp-content/uploads/2023/05/UXT_User_feedback_01.png";
   type MenuItem = Required<MenuProps>['items'][number];
   const [key, setKey] = useState('');
   const navigate = useNavigate();
-
+  const { Text } = Typography;
   const handleLogout = async () => {
     const refeshToken = localStorage.getItem('refeshToken') ?? '';
     const res = await logoutAPI(refeshToken);
@@ -29,6 +32,57 @@ const AppHeader = () => {
     }
 
   }
+
+  const text = <span>Danh sách sản phẩm</span>;
+  const content = (
+    <>
+      {carts.map((item) => (
+        <div>
+          <Row>
+            <Col span={6}>
+              <Avatar size={45} icon={<img src={item.product.productMultiImage[0].image} alt="" />} />
+            </Col>
+            <Col span={18}>
+              <p>
+                <span>Tên SP: </span>
+                <span style={{ fontWeight: 'bold', color: '#7cb305' }}><Text ellipsis={{ tooltip: item.product?.name }} style={{ maxWidth: 100 }}>
+                  {item.product?.name}
+                </Text></span>
+              </p>
+              <Row>
+                <Col span={12}>
+                  <p>Giá: {item.product.price}</p>
+                </Col>
+                <Col span={12}>
+                  <p>Số Lượng: {item.value}</p>
+                </Col>
+
+              </Row>
+            </Col>
+            <Divider style={{ borderColor: '#7cb305', width: '200px' }} ></Divider>
+          </Row>
+
+        </div>
+      ))}
+      <Button type="primary" onClick={() => navigate('/checkout')} style={{ width: '100%' }}>Thanh toán</Button>
+    </>
+  );
+
+  const [arrow, setArrow] = useState<'Show' | 'Hide' | 'Center'>('Show');
+
+  const mergedArrow = useMemo<PopoverProps['arrow']>(() => {
+    if (arrow === 'Hide') {
+      return false;
+    }
+
+    if (arrow === 'Show') {
+      return true;
+    }
+
+    return {
+      pointAtCenter: true,
+    };
+  }, [arrow]);
   const items: MenuItem[] = [
     {
       label: <Link to="/">Trang Chủ</Link>,
@@ -72,7 +126,14 @@ const AppHeader = () => {
       icon: <TfiSearch onClick={() => console.log(key)} />,
     },
     ...(isAuthenticated ? [{
-      label: <Link to="/checkout"><Badge count={coutCart}><span></span></Badge></Link>,
+      label:
+        <Popover placement="bottomLeft" title={text} content={content} arrow={mergedArrow}>
+          <Link to="/checkout">
+            <Badge count={coutCart}><span></span></Badge>
+          </Link>
+        </Popover>,
+
+
       key: 'cart',
       icon: <CiShoppingCart style={{ fontSize: '20px' }} />,
     },] : []),

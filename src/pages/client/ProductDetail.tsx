@@ -1,30 +1,39 @@
+import { useCurrentApp } from "@/components/context/app.context";
 import { getProductByAuthor, getProductById } from "@/services/api";
-import { Alert, Button, Col, Divider, Input, Rate, Row, Spin } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
+import { Alert, Button, Col, Divider, Input, message, Rate, Row, Spin, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { PiShoppingCart } from "react-icons/pi";
 import ReactImageGallery from "react-image-gallery";
-import { useNavigate, useParams } from "react-router-dom";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
-import { LoadingOutlined } from "@ant-design/icons";
+import { useNavigate, useParams } from "react-router-dom";
 import ProductDetailLoading from "./ProductDetailLoading";
-import { useCurrentApp } from "@/components/context/app.context";
 const ProductDetail = () => {
   const [value, setValue] = useState(1);
   const { id } = useParams();
   const [product, setProduct] = useState<IProduct>();
   const [productAuthor, setProductAuthor] = useState<IProduct[]>();
-  const [cart, setCart] = useState<ICart[]>(()=>{
+  const [cart, setCart] = useState<ICart[]>(() => {
     const saveCart = localStorage.getItem('cart');
     return saveCart ? JSON.parse(saveCart) : [];
   });
-  const { isAuthenticated,setCoutCart } = useCurrentApp();
+  const { Text } = Typography;
+  const { isAuthenticated, setCoutCart, setCarts } = useCurrentApp();
 
   const images = product?.productMultiImage.map((item) => ({ original: item.image, thumbnail: item.image, originalHeight: 350, thumbnailHeight: 80 })) || [];
   const [activeLoading, setActiveLoading] = useState<any>(true);
   const navigate = useNavigate();
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const success = () => {
+    messageApi.open({
+      type: 'success',
+      content: 'Thêm vào giỏ hàng thành công',
+    });
+  };
   const getDataById = async () => {
-   
+
     const res = await getProductById(Number(id));
     if (res) {
       setProduct(res?.data?.data);
@@ -60,41 +69,56 @@ const ProductDetail = () => {
     }
   };
   const handleChangeValue = (e: number) => {
-    if(e < 1){
+    if (e < 1) {
       setValue(1);
-    }else if(e > product?.quantity! ){
+    } else if (e > product?.quantity!) {
       setValue(product?.quantity!);
-    }else{
-    setValue(e);
+    } else {
+      setValue(e);
     }
   }
 
-  const handleAddToCart = (product: IProduct | undefined,value: number) => {
-    if(!isAuthenticated){
+  const handleAddToCart = (product: IProduct | undefined, value: number) => {
+    if (!isAuthenticated) {
+      localStorage.setItem('redirectAfterLogin', location.pathname + location.search);
       navigate('/login');
+      return;
     }
     const dataCart = localStorage.getItem('cart');
     let cartItem = dataCart ? JSON.parse(dataCart) : [...cart];
-    const id =  product?.id;
+    const id = product?.id;
     const existingProductIndex = cartItem.findIndex(
       (item: ICart) => item?.product?.id == id
     )
-    let count = 0;
-    for(let i = 0; i < cartItem.length; i++){
-      count += cartItem[i].value
-    }
-    setCoutCart(count);
+
 
     let updatedCart: ICart[];
-    if(existingProductIndex >=0){
+    if (existingProductIndex >= 0) {
       updatedCart = [...cartItem];
       updatedCart[existingProductIndex].value += value;
-    
-    }else{
+
+    } else {
       updatedCart = [...cartItem, { product, value: value }];
     }
     setCart(updatedCart);
-    localStorage.setItem("cart",JSON.stringify(updatedCart));
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    setCarts(updatedCart);
+
+    success();
+    let count = 0;
+    for (let i = 0; i < updatedCart.length; i++) {
+      count += updatedCart[i].value
+    }
+
+    setCoutCart(count);
+  }
+
+  const handleBuyNow = (product: IProduct | undefined, value: number) => {
+    if (!isAuthenticated) {
+      localStorage.setItem('redirectAfterLogin', location.pathname + location.search);
+      navigate('/login');
+    }
+
   }
   useEffect(() => {
     getDataById();
@@ -102,7 +126,9 @@ const ProductDetail = () => {
   }, [id])
   return (
     <div>
+      {contextHolder}
       {activeLoading ? <ProductDetailLoading activeLoading={activeLoading} setActiveLoading={setActiveLoading} /> : <Row >
+
         <Col sm={24} md={12}>
           <div style={{ width: '400px', height: '100px', margin: "auto", marginBottom: "350px" }}>
             <ReactImageGallery items={images} showNav={false} showFullscreenButton={false} showPlayButton={false} showBullets={false} />
@@ -112,7 +138,11 @@ const ProductDetail = () => {
         <Col sm={24} md={12} style={{ paddingLeft: 20 }}>
           <Alert message={<span>Tác giả: <a>{product?.author}</a></span>} type="success" style={{ marginRight: 10 }} />
           <br />
-          <h1>{product?.name}</h1>
+          <h1>
+            <Text ellipsis={{ tooltip: product?.name }}>
+              {product?.name}
+            </Text>
+          </h1>
           <Rate value={product?.vote} disabled style={{ paddingTop: 10, paddingBottom: 10 }} />
           <br />
           <Col span={24}>
@@ -132,13 +162,13 @@ const ProductDetail = () => {
 
           <Row style={{ paddingTop: 20 }}>
             <Col><Button type="primary" onClick={() => handleAddToCart(product, value)}>Thêm Vào Giỏ Hàng <PiShoppingCart /></Button></Col>
-            <Col style={{ paddingLeft: 10, }}><Button style={{ backgroundColor: '#FF3300', color: 'white' }}>Mua Ngay</Button></Col>
+            <Col style={{ paddingLeft: 10, }}><Button style={{ backgroundColor: '#FF3300', color: 'white' }} onClick={() => handleBuyNow(product, value)}>Mua Ngay</Button></Col>
           </Row>
 
         </Col>
 
       </Row>}
-      
+
       <Divider style={{ borderColor: '#7cb305' }} ><p>Các sản phẩm khác cùng tác giả</p></Divider>
       <div style={{ height: '100px', paddingLeft: 20, marginBottom: 100 }}>
         <Carousel
@@ -167,10 +197,18 @@ const ProductDetail = () => {
                 width={150}
                 height={150}
               />
-              <Alert message={item.name} style={{ width: 150, textAlign: 'center' }} type="success" />
+              <Alert
+                message={
+                  item.name.length > 17
+                    ? `${item.name.substring(0, 17)}...`
+                    : item.name
+                }
+                style={{ width: 150, textAlign: 'center' }}
+                type="success"
+              />
             </div>
-          )):<>
-          <Spin  indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
+          )) : <>
+            <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
           </>}
 
 

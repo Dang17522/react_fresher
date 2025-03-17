@@ -1,9 +1,9 @@
 import { Flex, Skeleton, Space } from 'antd';
 import { useState } from 'react';
 
-const ProductDetailLoading = (props:any) => {
+const ProductDetailLoading = (props: any) => {
   type SizeType = 'default' | 'small' | 'large';
-  const {activeLoading, setActiveLoading} = props
+  const { activeLoading, setActiveLoading } = props
   const [block, setBlock] = useState(false);
   const [size, setSize] = useState<SizeType>('default');
   type ButtonShapeType = 'circle' | 'square' | 'round' | 'default';

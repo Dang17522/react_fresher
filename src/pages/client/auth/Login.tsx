@@ -17,16 +17,16 @@ const Login = () => {
 const {setIsAuthenticated,setUser} = useCurrentApp();
   const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
     setLoading(true);
-    console.log("->>: ",values);
     const res = await loginAPI(values.username ?? '', values.password ?? '');
-    console.log("->>: ",res.data);
     if(res.data && res.data.status && res.data.status === 200){
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('refeshToken', res.data.refeshToken);
       setIsAuthenticated(true);
       setUser(res.data.user);
       // openNotificationWithIcon('success', res.data?.message);
-      navigate('/');
+      const afterLogin = localStorage.getItem('redirectAfterLogin') || '/';
+      localStorage.removeItem('redirectAfterLogin');
+      navigate(afterLogin);
     }else{
       // message.error(res.data?.message);
       openNotificationWithIcon('error', res.data?.message);
